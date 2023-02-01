@@ -1,4 +1,6 @@
-﻿namespace Banken
+﻿using System.Globalization;
+
+namespace Banken
 {
     internal class Program
     {
@@ -26,9 +28,9 @@
             Console.WriteLine("Välkommen till min bank!");
 
             int attemptsLeft = 3;
-            bool myBool = true;
+            bool runProgram = true;
 
-            while (myBool)
+            while (runProgram)
             {
 
                 Console.Write("Skriv in användarnamn: ");
@@ -40,24 +42,34 @@
 
                 for (int i = 0; i < username.Length; i++)
                 {
+                    
 
                     if (userInput.ToUpper() == username[i].ToUpper() && pin == pincode[i])
                     {
                         attemptsLeft = 3;
                         UserMenu(i, username, pincode, accountNames, accountBalances);
-
+                        
                     }
+                    //if (attemptsLeft == 0)
+                    //{
+                    //    Console.WriteLine("Programmet stängs nu ner.");
+                    //    runProgram = false;
+                    //}
                     //else
-                    //{ 
+                    //{
+                    //    Console.WriteLine("Inloggningen misslyckades. Du har " + attemptsLeft + " försök kvar.");
+                    //}
+                    //else
+                    //{
                     //    Console.WriteLine("Inloggningen misslyckades. Du har " + attemptsLeft + " försök kvar.");
 
                     //}
-
+                    //i = int.MaxValue - 1;
                 }
                 if (attemptsLeft == 0)
                 {
                     Console.WriteLine("Programmet stängs nu ner.");
-                    myBool = false;
+                    runProgram = false;
                 }
                 else
                 {
@@ -158,7 +170,7 @@
                             break;
                         case 3:
                             Console.Clear();
-                            Withdraw(pinCode, accounts[userIndex], balances[userIndex]);
+                            Withdraw(pinCode[userIndex], accounts[userIndex], balances[userIndex]);
                             break;
                         case 4:
                             //myMenu= false;
@@ -222,10 +234,37 @@
                 }
 
             }
-            static void Withdraw(int[] pin, string[]accounts, double[]balances)
+            static void Withdraw(int pin, string[]accounts, double[]balances)
             {
                 Console.WriteLine("==========Ta ut========== \nVälj vilket konto du vill ta ut pengar från genom att skriva in siffran till vänter om kontot\n");
                 ShowAccounts(accounts, balances);
+                int withdrawFrom = int.Parse(Console.ReadLine());
+
+                Console.Write("Ange summa att ta ut: ");
+                bool valid = Double.TryParse(Console.ReadLine(), out Double amount);
+
+                if (valid)
+                {
+                    Console.Write($"\nDu har valt att ta ut {amount}kr från ditt {accounts[withdrawFrom - 1]}\n\nVänligen bekräfta detta med din pinkod: ");
+                    int pincodeInput = int.Parse(Console.ReadLine());
+                    if (pincodeInput == pin)
+                    {
+                        balances[withdrawFrom - 1] -= amount;
+                        Console.Clear();
+                        Console.WriteLine($"\nPinkod korrekt! {amount}kr har nu tagits ut från ditt {accounts[withdrawFrom - 1]}\n");
+                        ShowAccounts(accounts, balances);
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nFel pinkod.");
+                    }
+                   
+                }
+                else
+                {
+                    Console.WriteLine("not a valid input");
+                }
+                
             }
             static void ShowAccounts(string[]accounts, double[]balances)
             {
