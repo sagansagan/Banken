@@ -1,2 +1,2 @@
 # Banken
-## A simple bank appliccation using C#
+## Simple bank appliccation using C#
