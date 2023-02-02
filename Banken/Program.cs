@@ -27,7 +27,7 @@
 
             int attemptsLeft = 3;//tillåtna försök innan programmet stängs ner
             bool runProgram = true;
-            
+
             while (runProgram)
             {
 
@@ -130,16 +130,16 @@
                 transferFrom -= 1;
                 transferTo -= 1;
 
-                if(transferFrom > accounts.Length || transferTo > accounts.Length) //om anv skrivit in ett felaktigt nummer ==> återgå till UserMenu
+                if (transferFrom > accounts.Length || transferTo > accounts.Length) //om anv skrivit in ett felaktigt nummer ==> återgå till UserMenu
                 {
                     IndexOutOfRange();
                     return;
                 }
-                
+
                 Console.WriteLine("Ange summa:");
 
                 //testar om input är korrekt
-                 bool validInput = Double.TryParse(Console.ReadLine(), out Double amount);
+                bool validInput = Double.TryParse(Console.ReadLine(), out Double amount);
 
                 if (validInput)
                 {
@@ -186,7 +186,7 @@
                 Console.Write("\nAnge summa att ta ut: ");
                 bool valid = Double.TryParse(Console.ReadLine(), out Double amount);
 
-                if(amount == 0)
+                if (amount <= 0)
                 {
                     Console.Clear();
                     Console.WriteLine("Ingen uttagning har skett.");
@@ -229,7 +229,6 @@
 
                 }
             }
-
 
             static void PressEnter()
             {
