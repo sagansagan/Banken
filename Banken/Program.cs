@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace Banken
+﻿namespace Banken
 {
     internal class Program
     {
@@ -24,17 +22,17 @@ namespace Banken
             accountBalances[3] = new double[] { 3677.23, 4560.00, 50000.93, 400000.32, 60000.21 };
             accountBalances[4] = new double[] { 1500.00, 3400.60, 35000.43, 96483.76, 600.23, 6000000.00 };
 
-
+            //start och inlogg
             Console.WriteLine("Välkommen till min bank!");
 
-            int attemptsLeft = 3;
+            int attemptsLeft = 3;//tillåtna försök innan programmet stängs ner
             bool runProgram = true;
-
+            
             while (runProgram)
             {
 
                 Console.Write("Skriv in användarnamn: ");
-                string userInput = Console.ReadLine();
+                string? userInput = Console.ReadLine();
 
                 Console.Write("Skriv in pinkod: ");
                 int.TryParse(Console.ReadLine(), out int pin);
@@ -42,37 +40,31 @@ namespace Banken
 
                 for (int i = 0; i < username.Length; i++)
                 {
-                    
+
 
                     if (userInput.ToUpper() == username[i].ToUpper() && pin == pincode[i])
                     {
                         attemptsLeft = 3;
                         UserMenu(i, username, pincode, accountNames, accountBalances);
-                        
+                        runProgram = false; //när användare trycker på 4 i usermenu
+                        break;
                     }
-                    //if (attemptsLeft == 0)
-                    //{
-                    //    Console.WriteLine("Programmet stängs nu ner.");
-                    //    runProgram = false;
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine("Inloggningen misslyckades. Du har " + attemptsLeft + " försök kvar.");
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine("Inloggningen misslyckades. Du har " + attemptsLeft + " försök kvar.");
 
-                    //}
-                    //i = int.MaxValue - 1;
                 }
-                if (attemptsLeft == 0)
+                if (runProgram == false) //OM någon tryckt på val 4 i usermenu
+                {
+                    runProgram = true; //programmet återställs 
+
+                }
+                else if (attemptsLeft == 0)
                 {
                     Console.WriteLine("Programmet stängs nu ner.");
                     runProgram = false;
+
                 }
                 else
                 {
+
                     Console.WriteLine("Inloggningen misslyckades. Du har " + attemptsLeft + " försök kvar.");
 
                 }
@@ -80,68 +72,6 @@ namespace Banken
 
             }
 
-            //LogIn(username, pincode, accountNames, accountBalances);
-
-
-            /*
-                Console.Write("lösenord:");
-                bool isValid = Int32.TryParse(Console.ReadLine(), out pin);
-              
-
-                if (isValid)
-                {
-
-                }//Använder metoden TryParse för felhantering
-
-               
-            }*/
-            //funktion för att logga in på banken
-            //static void LogIn(string[] userName, int[] pinCode, string[][] accounts, double[][] balances)
-            //{
-
-            //    int allowedAttempts = 3;
-            //    bool myBool = true;
-
-
-
-            //    while(myBool)
-            //    {
-
-            //            Console.Write("Ditt användarnamn: ");
-            //            string userInput = Console.ReadLine();
-
-            //            Console.Write("Skriv in pinkod: ");
-            //            int pin;
-            //            int.TryParse(Console.ReadLine(), out pin);
-
-            //        for (int i = 0; i < userName.Length; i++)
-            //        {
-
-            //            if (userInput.ToUpper() == userName[i].ToUpper() && pin == pinCode[i])
-            //            {
-
-            //                UserMenu(i, userName, pinCode, accounts, balances);
-            //                allowedAttempts = 3;
-            //            }
-            //            else if (i == userName.Length - 1)
-            //            {
-            //                allowedAttempts--;
-            //                Console.WriteLine("Inloggningen misslyckades. Du har " + allowedAttempts + " försök kvar.");
-            //                break;
-            //            }
-
-            //        }
-            //        if (allowedAttempts == 0)
-            //        {
-            //            Console.WriteLine("Programmet stängs nu ner.");
-            //            myBool = false;
-            //            Environment.Exit(0);
-            //            Console.ReadLine();
-            //        }
-
-            //    }
-            //}
-            //menyfunktion
             static void UserMenu(int userIndex, string[] userName, int[] pinCode, string[][] accounts, double[][] balances)
             {
                 bool myMenu = true;
@@ -173,24 +103,24 @@ namespace Banken
                             Withdraw(pinCode[userIndex], accounts[userIndex], balances[userIndex]);
                             break;
                         case 4:
-                            //myMenu= false;
                             Console.Clear();
                             return;
                         default:
                             Console.WriteLine("\nDu måste välja något av siffrorna 1-5 i menyn.");
                             break;
                     }
-                    PressEnter();
+                    PressEnter(); //När en funktion körts klart ==> tryck enter ==> återgå till början av UserMenu (användarens meny)
 
                 }
             }
 
+            //Funktion för att överföra pengar mellan konton
             static void Transfer(string[] accounts, double[] balances)
             {
                 Console.Clear();
-                Console.WriteLine("============Överföring===========");
-                Console.WriteLine("Välj ett konto mellan nummer 1 och " + accounts.Length + " :");
+                Console.WriteLine("============Överföring===========\n");
                 ShowAccounts(accounts, balances);
+                Console.WriteLine("\nVälj ett konto genom att skriva in en siffra mellan 1 och " + accounts.Length + ".");
 
                 //subtraherar anv svar med 1 för att få rätt index till variablelnamnen
                 Console.WriteLine("\nJag vill föra över från konto:");
@@ -200,11 +130,16 @@ namespace Banken
                 transferFrom -= 1;
                 transferTo -= 1;
 
-
+                if(transferFrom > accounts.Length || transferTo > accounts.Length) //om anv skrivit in ett felaktigt nummer ==> återgå till UserMenu
+                {
+                    IndexOutOfRange();
+                    return;
+                }
+                
                 Console.WriteLine("Ange summa:");
-                //testar om input är korrekt
 
-                bool validInput = Double.TryParse(Console.ReadLine(), out Double amount);
+                //testar om input är korrekt
+                 bool validInput = Double.TryParse(Console.ReadLine(), out Double amount);
 
                 if (validInput)
                 {
@@ -220,7 +155,8 @@ namespace Banken
                     }
                     else
                     {
-                        Console.WriteLine($"\n{amount}kr har nu förts över från: {accounts[transferFrom]} till: {accounts[transferTo]}");
+                        Console.Clear();
+                        Console.WriteLine($"\n{amount}kr har nu förts över från: {accounts[transferFrom]} till: {accounts[transferTo]}\n");
                         balances[transferFrom] -= amount;
                         balances[transferTo] += amount;
                         ShowAccounts(accounts, balances);
@@ -234,17 +170,30 @@ namespace Banken
                 }
 
             }
-            static void Withdraw(int pin, string[]accounts, double[]balances)
+            //funktion för att ta ut pengar
+            static void Withdraw(int pin, string[] accounts, double[] balances)
             {
-                Console.WriteLine("==========Ta ut========== \nVälj vilket konto du vill ta ut pengar från genom att skriva in siffran till vänter om kontot\n");
+                Console.WriteLine("==========Ta ut==========\n");
                 ShowAccounts(accounts, balances);
+                Console.WriteLine("\nVälj vilket konto du vill ta ut pengar från genom att skriva in siffran till vänter om kontot.");
                 int withdrawFrom = int.Parse(Console.ReadLine());
 
-                Console.Write("Ange summa att ta ut: ");
+                if (withdrawFrom > accounts.Length)
+                {
+                    IndexOutOfRange();
+                    return;
+                }
+                Console.Write("\nAnge summa att ta ut: ");
                 bool valid = Double.TryParse(Console.ReadLine(), out Double amount);
 
-                if (valid)
+                if(amount == 0)
                 {
+                    Console.Clear();
+                    Console.WriteLine("Ingen uttagning har skett.");
+                }
+                else if (valid && amount <= balances[withdrawFrom - 1])
+                {
+
                     Console.Write($"\nDu har valt att ta ut {amount}kr från ditt {accounts[withdrawFrom - 1]}\n\nVänligen bekräfta detta med din pinkod: ");
                     int pincodeInput = int.Parse(Console.ReadLine());
                     if (pincodeInput == pin)
@@ -258,15 +207,19 @@ namespace Banken
                     {
                         Console.WriteLine("\nFel pinkod.");
                     }
-                   
                 }
-                else
+                else if (!valid)
                 {
                     Console.WriteLine("not a valid input");
                 }
-                
+                else
+                {
+                    Console.WriteLine("ERROR! Tyvärr kan du inte ta ut mer än vad du har tillgängligt på kontot.");
+                }
+
             }
-            static void ShowAccounts(string[]accounts, double[]balances)
+            //funktion för att visa användarens konton
+            static void ShowAccounts(string[] accounts, double[] balances)
             {
                 Console.WriteLine("Dina konton och saldon:");
                 for (int i = 0; i < accounts.Length; i++)
@@ -280,10 +233,14 @@ namespace Banken
 
             static void PressEnter()
             {
-                Console.WriteLine("\nTryck enter för att gå tillbaka till huvudmenyn.");
+                Console.WriteLine("\nTryck enter för att återgå.");
                 Console.ReadLine();
             }
 
+            static void IndexOutOfRange()
+            {
+                Console.WriteLine("Du har angett ett eller fler ogiltiga alternativ. Vänligen välj ett giltigt nummer i listan");
+            }
 
         }
     }
